@@ -1,0 +1,16 @@
+
+.form-control-invalid {
+  color: red;
+}
+
+.login-wrap #login-form{
+  display: flex;
+  flex-flow: column;
+
+  > label {
+    padding: 6px 2px;
+  }
+}
+.login-submit-button {
+  width: 100px;
+}

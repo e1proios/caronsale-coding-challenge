@@ -1,0 +1,33 @@
+<div class="login-wrap">
+
+  <form id="login-form"
+    [formGroup]="loginForm"
+    (ngSubmit)="onFormSubmit()">
+
+    <label for="login-email"
+      [class.form-control-invalid]="highlightInvalidInput(loginForm.controls.email)">
+      E-Mail:
+
+      <input formControlName="email"
+        id="login-email"
+        type="text"
+        placeholder="e-mail"  
+        required>
+    </label>
+    
+    <label for="login-password"
+      [class.form-control-invalid]="highlightInvalidInput(loginForm.controls.password)">
+      Password:
+
+      <input formControlName="password"
+        id="login-password"
+        type="password"
+        placeholder="password"
+        required>
+    </label>
+
+    <button type="submit"
+      class="login-submit-button"
+      [disabled]= "!loginForm.valid">LOGIN</button>
+  </form>
+</div>
