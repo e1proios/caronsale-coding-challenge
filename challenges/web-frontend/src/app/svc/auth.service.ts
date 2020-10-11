@@ -3,21 +3,26 @@ import {
   HttpClient,
   HttpHeaders,
   HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { sha512 } from 'js-sha512';
-import { throwError } from 'rxjs';
+import { throwError, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { environment as env} from '../../environments/environment';
 import { LoginCredentials } from '../model/login-credentials';
+import { AuthObject } from '../model/auth-object';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private _authToken: AuthObject;
+  private _authTokenPublisher: BehaviorSubject<AuthObject> = new BehaviorSubject(null);
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   private hashPassword(plain: string, cycles: number): string {
@@ -30,8 +35,8 @@ export class AuthService {
     }
     return hash;
   }
-  private redirectOnAuthError(error: HttpErrorResponse) {
-    // TODO
+  private displayMessageOnAuthError(error: HttpErrorResponse) {
+    // TODO - modal with info
     return throwError(error.error || "authentication error");
   }
 
@@ -45,9 +50,14 @@ export class AuthService {
       `${env.authEndpoint}${credentials.email}`,
       { "password": encryptedPswd, "meta": "string" },
       { headers: headers})
-    .pipe(catchError(this.redirectOnAuthError))
-    .subscribe( response => {
-      console.log(response);
+    .pipe(catchError(this.displayMessageOnAuthError))
+    .subscribe( (authToken: AuthObject) => {
+      this._authToken = authToken;
+      this._authTokenPublisher.next(this._authToken);
+      this.router.navigate(['/user', credentials.email]);
     });
+  }
+  public get authToken(): BehaviorSubject<AuthObject> {
+    return this._authTokenPublisher;
   }
 }
