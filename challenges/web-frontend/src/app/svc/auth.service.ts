@@ -5,13 +5,11 @@ import {
   HttpErrorResponse } from '@angular/common/http';
 
 import { sha512 } from 'js-sha512';
-import { throwError, BehaviorSubject } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { environment as env} from '../../environments/environment';
 import { LoginCredentials } from '../model/login-credentials';
-
-const HASH_ITERATIONS = 5;
-const AUTH_ENDPOINT = 'https://caronsale-backend-service-dev.herokuapp.com/api/v1/authentication/';
 
 @Injectable({
   providedIn: 'root'
@@ -38,13 +36,13 @@ export class AuthService {
   }
 
   public login(credentials: LoginCredentials) {
-    const encryptedPswd = this.hashPassword(credentials.password, HASH_ITERATIONS);
+    const encryptedPswd = this.hashPassword(credentials.password, env.passwordHashIterations);
     let headers = new HttpHeaders().
       append('Accept', 'application/json').
       append('Content-Type', 'application/json');
 
     this.http.put(
-      `${AUTH_ENDPOINT}${credentials.email}`,
+      `${env.authEndpoint}${credentials.email}`,
       { "password": encryptedPswd, "meta": "string" },
       { headers: headers})
     .pipe(catchError(this.redirectOnAuthError))
