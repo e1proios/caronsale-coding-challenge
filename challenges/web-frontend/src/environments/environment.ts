@@ -5,7 +5,9 @@
 export const environment = {
   production: false,
   passwordHashIterations: 5,
-  authEndpoint: 'https://caronsale-backend-service-dev.herokuapp.com/api/v1/authentication/'
+  authEndpoint: 'https://caronsale-backend-service-dev.herokuapp.com/api/v1/authentication/',
+  dataEndpoint: 'https://caronsale-backend-service-dev.herokuapp.com/api/v1',
+  pollingInterval: 20000
 };
 
 /*

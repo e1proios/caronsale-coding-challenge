@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpHeaders,
-  HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { sha512 } from 'js-sha512';
@@ -19,6 +16,7 @@ import { AuthObject } from '../model/auth-object';
 export class AuthService {
   private _authToken: AuthObject;
   private _authTokenPublisher: BehaviorSubject<AuthObject> = new BehaviorSubject(null);
+  private _loggedOutPublisher: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
   constructor(
     private http: HttpClient,
@@ -52,12 +50,20 @@ export class AuthService {
       { headers: headers})
     .pipe(catchError(this.displayMessageOnAuthError))
     .subscribe( (authToken: AuthObject) => {
+      this.loggedOut.next(false);
       this._authToken = authToken;
       this._authTokenPublisher.next(this._authToken);
       this.router.navigate(['/user', credentials.email]);
     });
   }
+  public logout() {
+    this.loggedOut.next(true);
+    this.router.navigate(['/login']);
+  }
   public get authToken(): BehaviorSubject<AuthObject> {
     return this._authTokenPublisher;
+  }
+  public get loggedOut(): BehaviorSubject<boolean> {
+    return this._loggedOutPublisher;
   }
 }

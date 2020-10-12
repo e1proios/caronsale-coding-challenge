@@ -1,21 +1,51 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { timer, BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { AuthService } from './auth.service';
+import { environment as env } from '../../environments/environment';
 import { AuthObject } from '../model/auth-object';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DataService {
-  private subscriptions = [];
-  
+export class DataService implements OnDestroy {
+  private _subscriptions = [];
+  private _stopPolling: Subject<any>;
+  private _dataPublisher: BehaviorSubject<any> = new BehaviorSubject(null);
+
   constructor(
-    private authSvc: AuthService
+    private _authSvc: AuthService,
+    private _http: HttpClient
   ) {
-    this.subscriptions.push(
-      this.authSvc.authToken.subscribe( (authToken: AuthObject) => {
+    this._subscriptions.push(
+      this._authSvc.authToken.subscribe( (authToken: AuthObject) => {
         console.log(`Auth token received: ${authToken.token}`);
+
+        this._stopPolling = new Subject();
+        timer(0, env.pollingInterval).pipe(
+          takeUntil(this._stopPolling)
+        ).subscribe(val => {
+          this._dataPublisher.next(val);
+        });
       })
     );
+    this._subscriptions.push(
+      this._authSvc.loggedOut.subscribe( (loggedOut: boolean) => {
+        if (loggedOut) {
+          this._stopPolling.next();
+        }
+      })
+    );
+  }
+  ngOnDestroy() {
+    this._subscriptions.forEach( (sub: Subscription) => {
+      sub.unsubscribe();
+    });
+  }
+
+  public get data() {
+    return this._dataPublisher;
   }
 }
