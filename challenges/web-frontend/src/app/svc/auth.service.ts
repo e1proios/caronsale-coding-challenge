@@ -14,9 +14,11 @@ import { AuthObject } from '../model/auth-object';
 })
 export class AuthService {
   private _authToken: AuthObject;
+  private _userAuthorized = false;
+
   private _authTokenPublisher: BehaviorSubject<AuthObject> = new BehaviorSubject(null);
   private _loggedOutPublisher: BehaviorSubject<boolean> = new BehaviorSubject(true);
-  private _userNotAuthorizedPublisher: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private _loginFailedPublisher: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private _http: HttpClient,
@@ -35,7 +37,7 @@ export class AuthService {
   }
   private displayMessageOnAuthError(error: HttpErrorResponse) {
     if (error.status === 401) {
-      this._userNotAuthorizedPublisher.next(true);
+      this._loginFailedPublisher.next(true);
     }
     return throwError(error.error || "authentication error");
   }
@@ -49,10 +51,11 @@ export class AuthService {
     this._http.put(
       `${env.authEndpoint}${credentials.email}`,
       { "password": encryptedPswd, "meta": "string" },
-      { headers: headers})
+      { headers: headers })
     .subscribe(
       (authToken: AuthObject) => {
-        this._userNotAuthorizedPublisher.next(false)
+        this._userAuthorized = true;
+        this._loginFailedPublisher.next(false);
         this._loggedOutPublisher.next(false);
         this._authToken = authToken;
         this._authTokenPublisher.next(this._authToken);
@@ -74,7 +77,10 @@ export class AuthService {
   public get loggedOut(): BehaviorSubject<boolean> {
     return this._loggedOutPublisher;
   }
-  public get userNotAuthorized(): BehaviorSubject<boolean> {
-    return this._userNotAuthorizedPublisher;
+  public get loginFailed(): BehaviorSubject<boolean> {
+    return this._loginFailedPublisher;
+  }
+  public get isUserAuthorized(): boolean {
+    return this._userAuthorized;
   }
 }

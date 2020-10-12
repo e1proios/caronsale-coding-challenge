@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this._subscriptions = [];
 
     this._subscriptions.push(
-      this._authSvc.userNotAuthorized.subscribe(authFailed => {
+      this._authSvc.loginFailed.subscribe(authFailed => {
         if (authFailed) {
           this.messages.push('User not authorized');
           this.loginForm.patchValue({
