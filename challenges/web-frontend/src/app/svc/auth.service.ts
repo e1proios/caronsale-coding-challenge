@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 
 import { sha512 } from 'js-sha512';
 import { throwError, BehaviorSubject } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 import { environment as env} from '../../environments/environment';
 import { LoginCredentials } from '../model/login-credentials';
@@ -17,9 +16,10 @@ export class AuthService {
   private _authToken: AuthObject;
   private _authTokenPublisher: BehaviorSubject<AuthObject> = new BehaviorSubject(null);
   private _loggedOutPublisher: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  private _userNotAuthorizedPublisher: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
-    private http: HttpClient,
+    private _http: HttpClient,
     private router: Router
   ) {}
 
@@ -34,7 +34,9 @@ export class AuthService {
     return hash;
   }
   private displayMessageOnAuthError(error: HttpErrorResponse) {
-    // TODO - modal with info
+    if (error.status === 401) {
+      this._userNotAuthorizedPublisher.next(true);
+    }
     return throwError(error.error || "authentication error");
   }
 
@@ -44,20 +46,26 @@ export class AuthService {
       append('Accept', 'application/json').
       append('Content-Type', 'application/json');
 
-    this.http.put(
+    this._http.put(
       `${env.authEndpoint}${credentials.email}`,
       { "password": encryptedPswd, "meta": "string" },
       { headers: headers})
-    .pipe(catchError(this.displayMessageOnAuthError))
-    .subscribe( (authToken: AuthObject) => {
-      this.loggedOut.next(false);
-      this._authToken = authToken;
-      this._authTokenPublisher.next(this._authToken);
-      this.router.navigate(['/user', credentials.email]);
-    });
+    .subscribe(
+      (authToken: AuthObject) => {
+        this._userNotAuthorizedPublisher.next(false)
+        this._loggedOutPublisher.next(false);
+        this._authToken = authToken;
+        this._authTokenPublisher.next(this._authToken);
+        this.router.navigate(['/user', credentials.email]);
+      },
+      (err: HttpErrorResponse) => {
+        this.displayMessageOnAuthError(err);
+      }
+    );
   }
   public logout() {
-    this.loggedOut.next(true);
+    this._loggedOutPublisher.next(true);
+    this._authToken = null;
     this.router.navigate(['/login']);
   }
   public get authToken(): BehaviorSubject<AuthObject> {
@@ -65,5 +73,8 @@ export class AuthService {
   }
   public get loggedOut(): BehaviorSubject<boolean> {
     return this._loggedOutPublisher;
+  }
+  public get userNotAuthorized(): BehaviorSubject<boolean> {
+    return this._userNotAuthorizedPublisher;
   }
 }

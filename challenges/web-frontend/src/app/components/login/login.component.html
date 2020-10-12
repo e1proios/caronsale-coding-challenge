@@ -1,5 +1,14 @@
 <div class="login-wrap">
 
+  <div id="login-form-info"
+    *ngIf="messages.length">
+
+    <div class="warning-message"
+      *ngFor="let m of messages">
+      <span>{{m}}</span>
+    </div>
+  </div>
+
   <form id="login-form"
     [formGroup]="loginForm"
     (ngSubmit)="onFormSubmit()">
@@ -11,10 +20,10 @@
       <input formControlName="email"
         id="login-email"
         type="text"
-        placeholder="e-mail"  
+        placeholder="e-mail"
         required>
     </label>
-    
+
     <label for="login-password"
       [class.form-control-invalid]="highlightInvalidInput(loginForm.controls.password)">
       Password:
