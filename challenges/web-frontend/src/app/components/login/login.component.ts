@@ -25,6 +25,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       this._authSvc.userNotAuthorized.subscribe(authFailed => {
         if (authFailed) {
           this.messages.push('User not authorized');
+          this.loginForm.patchValue({
+            password: ''
+          });
         }
       })
     );
