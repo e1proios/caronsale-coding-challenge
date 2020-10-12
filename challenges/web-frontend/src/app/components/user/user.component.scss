@@ -1,0 +1,21 @@
+
+.user-container {
+  width: 50%;
+  min-width: 800px;
+  display: flex;
+  flex-flow: column;
+
+  .user-header {
+    background: #bbb;
+    color: #000;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+  }
+  .user-content {
+    display: flex;
+    flex-flow: column nowrap;
+  }
+}
