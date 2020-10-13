@@ -1,3 +1,40 @@
 <div class="auction-wrapper">
-  <span>Auction id: {{auctionData.id}}</span>
+  <div class="vehicle-info">
+    <div class="vehicle-thumbnail">
+      <!--[ngStyle]="{'background-image': carInfo.thumbnail}">-->
+    </div>
+    <div class="vehicle-details-wrapper">
+      <div class="vehicle-detail">
+        <span>Type: {{carInfo.type}}</span>
+      </div>
+      <div class="vehicle-detail">
+        <span>Color: {{carInfo.color}}</span>
+      </div>
+      <div class="vehicle-detail">
+        <span>EZ: {{carInfo.ez}}</span>
+      </div>
+      <div class="vehicle-detail">
+        <span>Mileage: {{carInfo.km}}</span>
+      </div>
+      <div class="vehicle-detail">
+        <span>Fuel type: {{carInfo.fuelType}}</span>
+      </div>
+      <div class="vehicle-detail">
+        <span>Transmission: {{carInfo.transmission}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="auction-info">
+    <div class="auction-detail">
+      <span>Highest Bid: {{auctionInfo.highestBid}}</span>
+    </div>
+
+    <div class="auction-detail">
+      <span>Highest bidder id: {{auctionInfo.highestBidderId}}</span>
+    </div>
+
+    <div class="auction-detail">
+      <span>Remaining Time: {{auctionInfo.remainingTime}}</span>
+    </div>
+  </div>
 </div>

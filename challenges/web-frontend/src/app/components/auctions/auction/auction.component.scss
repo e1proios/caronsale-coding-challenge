@@ -1,0 +1,32 @@
+
+.auction-wrapper {
+  padding: 6px 0;
+  border-bottom: 1px dotted #999;
+  display: flex;
+  flex-flow: column nowrap;
+
+  .vehicle-info {
+    display: flex;
+
+    .vehicle-thumbnail {
+      width: 120px;
+      height: 120px;
+      background-size: contain;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      background-color: #666;
+    }
+    .vehicle-details-wrapper {
+      flex: 1;
+      padding-left: 10px;
+    }
+  }
+  .auction-info {
+    flex: 1;
+
+    .auction-detail {
+      font-weight: 700;
+      padding: 4px 0;
+    }
+  }
+}
