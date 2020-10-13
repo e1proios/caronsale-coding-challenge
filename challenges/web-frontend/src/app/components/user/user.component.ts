@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../svc/auth.service';
 import { DataService } from '../../svc/data.service';
+import { AuthObject } from '../../model/auth-object';
 
 @Component({
   selector: 'app-user',
@@ -28,6 +29,11 @@ export class UserComponent implements OnInit, OnDestroy {
     this._subscriptions.push(
       this.route.params.subscribe( params => {
         this.userId = params['id'];
+      })
+    );
+    this._subscriptions.push(
+      this._authSvc.authToken.subscribe( (authToken: AuthObject) => {
+        this._dataSvc.startAuctionDataRetrieval(authToken);
       })
     );
     this._subscriptions.push(
