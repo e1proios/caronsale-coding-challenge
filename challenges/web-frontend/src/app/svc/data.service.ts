@@ -1,7 +1,23 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { timer, BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { takeUntil, switchMap } from 'rxjs/operators';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse
+} from '@angular/common/http';
+import {
+  timer,
+  BehaviorSubject,
+  Subject,
+  Subscription,
+  throwError
+} from 'rxjs';
+import {
+  takeUntil,
+  switchMap,
+  retry,
+  share,
+  catchError
+} from 'rxjs/operators';
 
 import { environment as env } from '../../environments/environment';
 import { AuthObject } from '../model/auth-object';
@@ -21,7 +37,7 @@ export class DataService implements OnDestroy {
   ) {
     this._subscriptions.push(
       this._authSvc.loggedOut.subscribe( (loggedOut: boolean) => {
-        if (loggedOut) {
+        if (loggedOut && this._stopPolling) {
           this._stopPolling.next();
         }
       })
@@ -44,17 +60,22 @@ export class DataService implements OnDestroy {
       append('authtoken', authToken.token);
 
     this._stopPolling = new Subject();
-    this._http.get(
-      env.getDataEndpoint(authToken.userId, null),
-      { headers: dataRequestHeaders }
+    timer(0, env.pollingInterval).pipe(
+      switchMap(() => {
+        return this._http.get(
+          env.getDataEndpoint(authToken.userId, null),
+          { headers: dataRequestHeaders }
+        )
+      }),
+      catchError(this.handleError),
+      retry(),
+      share(),
+      takeUntil(this._stopPolling)
     ).subscribe(response => {
       this._dataPublisher.next(response);
     });
-    /*
-    timer(0, env.pollingInterval).pipe(
-      takeUntil(this._stopPolling)
-    ).subscribe(val => {
-      this._dataPublisher.next(val);
-    });*/
+  }
+  private handleError(error: HttpErrorResponse) {
+    return throwError(error.error || "couldn't get auctions data");
   }
 }
