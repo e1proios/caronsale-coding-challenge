@@ -1,1 +1,5 @@
-<p>auctions works!</p>
+<div class="auctions-wrapper">
+  <div *ngFor="let a of auctions">
+    <app-auction [auctionData]="a"></app-auction>
+  </div>
+</div>

@@ -6,5 +6,18 @@
   </div>
 
   <div class="user-content">
+    
+    <div *ngIf="messages.length"
+      class="user-messages">
+
+      <div *ngFor="let m of messages">
+        <span class="user-message"
+          [class]="m.severity">{{m.text}}</span>
+      </div>
+    </div>
+
+    <ng-container *ngIf="displayAuctions">
+      <app-auctions [auctions]="userAuctions"></app-auctions>
+    </ng-container>
   </div>
 </div>

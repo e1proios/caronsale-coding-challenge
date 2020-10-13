@@ -1,7 +1,7 @@
 
 .user-container {
   width: 50%;
-  min-width: 800px;
+  min-width: 600px;
   display: flex;
   flex-flow: column;
 
@@ -17,5 +17,9 @@
   .user-content {
     display: flex;
     flex-flow: column nowrap;
+    padding: 6px 12px;
+  }
+  .user-message.warning {
+    color: red;
   }
 }

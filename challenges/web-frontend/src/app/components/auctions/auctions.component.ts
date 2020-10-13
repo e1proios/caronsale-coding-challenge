@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-auctions',
@@ -6,10 +6,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./auctions.component.scss']
 })
 export class AuctionsComponent implements OnInit {
+  @Input() auctions;
 
   constructor() { }
 
   ngOnInit(): void {
   }
-
 }

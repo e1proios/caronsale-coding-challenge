@@ -15,6 +15,11 @@ export class UserComponent implements OnInit, OnDestroy {
   private _subscriptions: Subscription[];
   userId: string;
   userAuctions;
+  messages: {
+    text: string,
+    severity: string
+  }[] = [];
+  displayAuctions = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,7 +38,24 @@ export class UserComponent implements OnInit, OnDestroy {
     );
     this._subscriptions.push(
       this._authSvc.authToken.subscribe( (authToken: AuthObject) => {
-        this._dataSvc.startAuctionDataRetrieval(authToken);
+        if (authToken.privileges.includes('DEALERSHIP_USER')) {
+          this.messages = [];
+          this.displayAuctions = true;
+          this._dataSvc.startAuctionDataRetrieval(authToken);
+        } else
+        if (authToken.privileges.includes('SALESMAN_USER')) {
+          this.displayAuctions = false;
+          this.messages.push({
+            text: 'Salesman user is not authorized to view running auctions',
+            severity: 'warning'
+          });
+        } else {
+          this.displayAuctions = false;
+          this.messages.push({
+            text: 'User with unknown privileges is not authorized to view running auctions',
+            severity: 'warning'
+          });
+        }
       })
     );
     this._subscriptions.push(
