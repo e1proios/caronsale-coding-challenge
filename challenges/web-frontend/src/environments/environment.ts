@@ -5,9 +5,14 @@
 export const environment = {
   production: false,
   passwordHashIterations: 5,
-  authEndpoint: 'https://caronsale-backend-service-dev.herokuapp.com/api/v1/authentication/',
-  dataEndpoint: 'https://caronsale-backend-service-dev.herokuapp.com/api/v1',
-  pollingInterval: 20000
+  apiBase: 'https://caronsale-backend-service-dev.herokuapp.com/api/',
+  pollingInterval: 20000,
+  getAuthEndpoint: () => {
+    return `${environment.apiBase}v1/authentication/`;
+  },
+  getDataEndpoint: (userId, filter) => {
+    return `${environment.apiBase}v2/auction/seller/${userId}/running?filter=${filter}`;
+  }
 };
 
 /*

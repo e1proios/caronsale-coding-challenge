@@ -13,6 +13,7 @@ import { DataService } from '../../svc/data.service';
 export class UserComponent implements OnInit, OnDestroy {
   private _subscriptions: Subscription[];
   userId: string;
+  userAuctions;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,13 +27,14 @@ export class UserComponent implements OnInit, OnDestroy {
 
     this._subscriptions.push(
       this.route.params.subscribe( params => {
-        const userId = params['id'];
-        this.userId = userId;
+        this.userId = params['id'];
       })
     );
     this._subscriptions.push(
       this._dataSvc.data.subscribe( data => {
-        console.log(`User component received data ${data}`);
+        if (data) {
+          this.userAuctions = data.items;
+        }
       })
     );
   }

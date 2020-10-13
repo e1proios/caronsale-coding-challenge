@@ -49,7 +49,7 @@ export class AuthService {
       append('Content-Type', 'application/json');
 
     this._http.put(
-      `${env.authEndpoint}${credentials.email}`,
+      `${env.getAuthEndpoint()}${credentials.email}`,
       { "password": encryptedPswd, "meta": "string" },
       { headers: headers })
     .subscribe(

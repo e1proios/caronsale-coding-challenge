@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { timer, BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { environment as env } from '../../environments/environment';
 import { AuthObject } from '../model/auth-object';
@@ -21,14 +21,25 @@ export class DataService implements OnDestroy {
   ) {
     this._subscriptions.push(
       this._authSvc.authToken.subscribe( (authToken: AuthObject) => {
-        console.log(`Auth token received: ${authToken.token}`);
+        const dataRequestHeaders = new HttpHeaders().
+          append('Accept', 'application/json').
+          append('Content-Type', 'application/json').
+          append('userid', authToken.userId).
+          append('authtoken', authToken.token);
 
         this._stopPolling = new Subject();
+        this._http.get(
+          env.getDataEndpoint(authToken.userId, null),
+          { headers: dataRequestHeaders }
+        ).subscribe(response => {
+          this._dataPublisher.next(response);
+        });
+        /*
         timer(0, env.pollingInterval).pipe(
           takeUntil(this._stopPolling)
         ).subscribe(val => {
           this._dataPublisher.next(val);
-        });
+        });*/
       })
     );
     this._subscriptions.push(
